@@ -1,7 +1,5 @@
 # AI-Agent-Developer-Instant-x-ODC
 
-# AI Agent Developer — Instant x ODC
-
 A hands-on 5-day intensive training on building AI Agents , from prompt engineering to multi-agent systems, RAG pipelines, and automation workflows. This repo documents everything covered and includes the runnable workflows I built during the program.
 
 **Program:** Instant × Orange Digital Center
