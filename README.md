@@ -1,4 +1,4 @@
-# AI-Agent-Developer-Instant-x-ODC
+# AI Agent Developer - Instant x ODC
 
 A hands-on 5-day intensive training on building AI Agents , from prompt engineering to multi-agent systems, RAG pipelines, and automation workflows. This repo documents everything covered and includes the runnable workflows I built during the program.
 
@@ -46,7 +46,17 @@ A PDF-based Conversational Retrieval QA chatflow built in Flowise: documents are
 n8n workflows automating tasks such as Telegram bot interactions, Google Sheets/Gmail integrations, and web search tool calls (Tavily) routed through an LLM (OpenRouter).
 
 ### 3. Educational Notebooks - LangChain, LangGraph & CrewAI
-Hands-on Jupyter notebooks from the training covering LangChain fundamentals (chains, tools, LCEL), LangGraph for building agent workflows/state machines, and CrewAI for multi-agent collaboration.
+Hands-on Jupyter notebooks from the training, all running LLM calls through OpenRouter:
+
+| Notebook | Covers |
+|---|---|
+| `1-langchain_prompt_templates_openrouter_EN.ipynb` | LangChain prompt templates , why raw f-strings don't scale, and how to build reusable templates (e.g. tone/style transformation of customer emails) |
+| `2-langchain-output-parsing-openrouter-pydantic.ipynb` | Getting structured (JSON/Pydantic) output from an LLM instead of raw text, using LangChain 1.x |
+| `3_langchain_chatbots_memory_openrouter_langgraph.ipynb` | Giving a chatbot memory using LangGraph's `StateGraph` and `thread_id`-based conversation state, replacing the old `ConversationBufferMemory` |
+| `4_evaluating_llm_applications_openrouter.ipynb` | Evaluating an LLM application's accuracy: building a document QA chain over a user-uploaded PDF (`InMemoryVectorStore` + retrieval chain) and testing it against data points |
+| `5-building_llm_agents_openrouter_gptoss20b_updated.ipynb` | Building a tool-calling LLM agent from scratch with LangChain (custom calculator + Wikipedia tools) using the `gpt-oss-20b` model |
+| `crew_openrouter_agentops-Answer.ipynb` | Working version of a 2-agent CrewAI crew (Researcher + Writer) run through OpenRouter's free `gpt-oss-20b:free` model, fully instrumented with AgentOps (session replay, cost tracking, failure detection) |
+| `crew_openrouter_agentops-Eror.ipynb` | Same CrewAI + AgentOps setup, kept as a reference for a common integration bug (synchronous `kickoff()` inside a running event loop / deprecated `agentops.end_session()` call) and how it fails |
 
 ---
 
@@ -79,7 +89,7 @@ Hands-on Jupyter notebooks from the training covering LangChain fundamentals (ch
 1. Open the `notebooks/` folder.
 2. Launch with Jupyter Notebook/Lab, or open directly in Google Colab / VS Code.
 3. Install any required packages listed at the top of each notebook (e.g. `langchain`, `langgraph`, `crewai`).
-4. Add your own API keys where the notebook prompts for them (e.g. OpenRouter, Hugging Face).
+4. Add your own API keys where the notebook prompts for them (e.g. OpenRouter for LLM calls, AgentOps for the CrewAI observability notebook).
 5. Run the cells in order.
 
 ---
