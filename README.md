@@ -39,13 +39,13 @@ ai-agent-developer-instant-x-odc/
 
 ## Projects in This Repo
 
-### 1. RAG System — Flowise
+### 1. RAG System - Flowise
 A PDF-based Conversational Retrieval QA chatflow built in Flowise: documents are chunked, embedded with HuggingFace Inference Embeddings, and stored in an in-memory vector store, with an OpenRouter-hosted LLM (Gemini 2.5 Flash) generating grounded answers with chat memory.
 
-### 2. Automation Workflows — n8n
+### 2. Automation Workflows - n8n
 n8n workflows automating tasks such as Telegram bot interactions, Google Sheets/Gmail integrations, and web search tool calls (Tavily) routed through an LLM (OpenRouter).
 
-### 3. Educational Notebooks — LangChain, LangGraph & CrewAI
+### 3. Educational Notebooks - LangChain, LangGraph & CrewAI
 Hands-on Jupyter notebooks from the training covering LangChain fundamentals (chains, tools, LCEL), LangGraph for building agent workflows/state machines, and CrewAI for multi-agent collaboration.
 
 ---
