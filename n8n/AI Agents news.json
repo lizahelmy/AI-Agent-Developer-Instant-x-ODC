@@ -1,0 +1,276 @@
+{
+  "name": "task_1",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -192,
+        48
+      ],
+      "id": "51c1b718-c0ff-49df-88da-353ddd1f8b03",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6dae79e4-2bb4-4b01-86a6-cbfe9174b167",
+              "name": "topic",
+              "value": "AI agent news",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        0,
+        48
+      ],
+      "id": "b0e70158-3434-4a74-876c-331b8e1af6d7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=title :{{ $json.results[0].title }}\ncontent : {{ $json.results[0].content }}",
+        "options": {
+          "systemMessage": "='You are a research assistant. Research today's most relevant news on {{ $json.query }} . Use the search tool to find sources, use the sheet-read tool to check what was already reported, then summarize the top 3 new findings with source links. Skip anything already logged.'  "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        432,
+        48
+      ],
+      "id": "5f85fadb-7bde-4ffa-918a-310bb369daab",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        448,
+        288
+      ],
+      "id": "3d11a799-3d33-42a7-820a-b6c0c651172e",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "9gV7ywfeKZKBZdRY",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "lizahelmy44@gmail.com",
+        "subject": "=AI Agent news",
+        "emailType": "text",
+        "message": "={{ $('AI Agent').item.json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        64
+      ],
+      "id": "eb540d79-38a5-4522-b2d8-26ef676bf14e",
+      "name": "Send a message",
+      "webhookId": "6a3815bb-7cae-4662-a1f1-e7f2c037be5a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "zA1poFHQO1vUEblP",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"{{ $json.topic }}\",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 1,\n  \"time_range\": null,\n  \"start_date\": \"2025-02-09\",\n  \"end_date\": \"2025-12-29\",\n  \"include_answer\": false,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null,\n  \"include_usage\": false\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        128
+      ],
+      "id": "bc225503-6511-4cd7-b8a5-a7753e606dc6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ni2AreVWwUs8rHgqDUr7v2Vk_6AkX3bIxigdlv_YM44",
+          "mode": "list",
+          "cachedResultName": "task1 - AI agents news",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ni2AreVWwUs8rHgqDUr7v2Vk_6AkX3bIxigdlv_YM44/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ni2AreVWwUs8rHgqDUr7v2Vk_6AkX3bIxigdlv_YM44/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "news": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "news"
+          ],
+          "schema": [
+            {
+              "id": "news",
+              "displayName": "news",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        800,
+        160
+      ],
+      "id": "4006e204-ec3c-4c7c-bc77-b67a0acc84ed",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SQXZvszVaSd5EbzJ",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "fbca55ce-dda0-441d-acf4-83ec4e020205",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "76ffb57e7c80d170582272e8b18dbd64b807ce6dddb7fcdc1c41b59303cb13a9"
+  },
+  "nodeGroups": [],
+  "id": "eVhPeyHAB8hMcCiI",
+  "tags": []
+}

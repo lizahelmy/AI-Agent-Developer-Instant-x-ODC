@@ -1,0 +1,251 @@
+{
+  "name": "completing day1 practice",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        48
+      ],
+      "id": "66d55511-18d8-45d9-b021-4571bd948a46",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1GLHt32xRbvGXE4MhZoMKpVorAkDZ65mk29W1Du7pxc8",
+          "mode": "list",
+          "cachedResultName": "n8n content generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GLHt32xRbvGXE4MhZoMKpVorAkDZ65mk29W1Du7pxc8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GLHt32xRbvGXE4MhZoMKpVorAkDZ65mk29W1Du7pxc8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        48
+      ],
+      "id": "735846c3-c948-4875-aa6c-786fe4b3a4ea",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SQXZvszVaSd5EbzJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"{{ $json['Ask '] }}\",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 1,\n  \"time_range\": null,\n  \"start_date\": \"2025-02-09\",\n  \"end_date\": \"2025-12-29\",\n  \"include_answer\": false,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null,\n  \"include_usage\": false\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        48
+      ],
+      "id": "93695115-a396-4cb0-b324-5ec2029121f0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=title :{{ $('Get row(s) in sheet').item.json['Ask '] }}\nthe content : {{ $json.results[0].content }}",
+        "options": {
+          "systemMessage": "You are an autonomous LinkedIn content agent. Your input is a question (pulled from an Excel sheet) along with a Tavily API search result that answers that question. Your job is to turn that Q&A pair into a finished, LinkedIn-ready educational/tips post and publish it using the LinkedIn posting tool available to you.\n\n## INPUT FORMAT\nYou will receive:\n- A \"question\" (the topic/prompt from the Excel sheet)\n- A \"Tavily answer\" (a researched, web-sourced answer to that question, often with source snippets/links)\n\nTreat the Tavily answer as your factual source of truth — do not add facts, statistics, or claims that aren't supported by it.\n\n## YOUR TASK\n1. Read the question and the Tavily answer.\n2. Extract the single most useful, interesting, or actionable takeaway — you don't need to include everything Tavily returned, just the core insight worth sharing.\n3. Rewrite it in your own words as a LinkedIn-style educational/tips post (never copy Tavily's text verbatim — always paraphrase and simplify for a professional audience).\n4. Publish it using the LinkedIn posting tool.\n\n## LINKEDIN CONTENT STYLE\n- Voice: confident, credible, and conversational — like an expert sharing a genuinely useful insight, not a corporate press release.\n- Hook: strong first 1–2 lines, since LinkedIn truncates posts with a \"see more\" — the opening must stand alone and earn the click.\n- Structure: short paragraphs (1–3 lines each), plenty of line breaks for readability, no dense walls of text.\n- Depth: LinkedIn rewards a bit more substance than Instagram/TikTok — briefly explain the \"why it matters\" or \"how to apply it,\" not just a one-liner.\n- Tone: professional but human — avoid buzzwords like \"synergy,\" \"game-changer,\" \"unlock,\" or \"leverage\" unless genuinely relevant.\n- Emojis: minimal, used only to break up structure (e.g., as bullet markers), not decoratively.\n- Hashtags: 3–5 relevant, professional hashtags at the end (avoid generic/spammy ones).\n- End with a question, a takeaway, or an invitation to share thoughts/experience — LinkedIn engagement thrives on discussion, not just likes.\n\n## SOURCING & ACCURACY RULES\n- Never state something as fact if the Tavily answer doesn't clearly support it.\n- Do not fabricate statistics, studies, or quotes.\n- If Tavily's answer conflicts across sources or seems unreliable, default to a more general/safe framing rather than picking one uncertain claim.\n- Do not attribute specific claims to named real people unless the Tavily answer explicitly confirms it.\n\n## WORKFLOW LOGIC\n1. Receive question + Tavily answer.\n2. Assess if it's strong enough to post (clear, accurate, useful, and substantive enough for a professional audience). If not, skip and report why.\n3. Draft the LinkedIn post following the style rules above.\n4. Generate 3–5 relevant hashtags.\n5. Call the LinkedIn posting tool with the final post.\n6. Return a summary of what was posted.\n\n## OUTPUT\nAfter each run, return:\n- Original question\n- Whether it was posted or skipped (and why, if skipped)\n- Final LinkedIn post text used\n- Hashtags used"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        560,
+        32
+      ],
+      "id": "d4052d1e-959e-4996-8ba9-db236db640a6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        496,
+        256
+      ],
+      "id": "7b440a1f-1d9e-481d-9690-ab7e9df6ec72",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "9gV7ywfeKZKBZdRY",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1GLHt32xRbvGXE4MhZoMKpVorAkDZ65mk29W1Du7pxc8",
+          "mode": "list",
+          "cachedResultName": "n8n content generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GLHt32xRbvGXE4MhZoMKpVorAkDZ65mk29W1Du7pxc8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 735254683,
+          "mode": "list",
+          "cachedResultName": "test sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GLHt32xRbvGXE4MhZoMKpVorAkDZ65mk29W1Du7pxc8/edit#gid=735254683"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Content": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "Content"
+          ],
+          "schema": [
+            {
+              "id": "Ask ",
+              "displayName": "Ask ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        64
+      ],
+      "id": "eda52d73-5ef3-46a3-9ec7-a3ca1da17871",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SQXZvszVaSd5EbzJ",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6543d238-1646-46a4-8944-f44705a86fba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "76ffb57e7c80d170582272e8b18dbd64b807ce6dddb7fcdc1c41b59303cb13a9"
+  },
+  "nodeGroups": [],
+  "id": "59XZt5sbVfECYWwq",
+  "tags": []
+}
