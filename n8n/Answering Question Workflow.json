@@ -54,7 +54,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer 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"
+              "value": "Bearer tavily api key"
             }
           ]
         },
